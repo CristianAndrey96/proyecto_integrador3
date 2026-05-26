@@ -70,6 +70,7 @@ function App() {
   const [alarmButtonDisabled, setAlarmButtonDisabled] = useState(false);
   const [alarmModalTask, setAlarmModalTask] = useState(null);
   const [completePromptTask, setCompletePromptTask] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const alarmIntervalRef = useRef(null);
   const alarmAudioContextRef = useRef(null);
@@ -759,14 +760,25 @@ function App() {
               <span className="user-role">Organizador de Tareas</span>
             </div>
           </div>
-          <div className="header-actions">
-            <button className="btn-theme-toggle" onClick={toggleTheme}>
+          
+          <button 
+            className={`hamburger-menu ${isMobileMenuOpen ? 'open' : ''}`}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Alternar menú"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div className={`header-actions ${isMobileMenuOpen ? 'show' : ''}`}>
+            <button className="btn-theme-toggle" onClick={() => { toggleTheme(); setIsMobileMenuOpen(false); }}>
               {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
             </button>
-            <button className="btn-enable-alarms" disabled={alarmButtonDisabled} onClick={enableAlarms}>
+            <button className="btn-enable-alarms" disabled={alarmButtonDisabled} onClick={() => { enableAlarms(); setIsMobileMenuOpen(false); }}>
               {alarmButtonText}
             </button>
-            <button className="btn-download-report" id="btnDownloadReport" onClick={downloadReport} title="Descargar informe PDF">
+            <button className="btn-download-report" id="btnDownloadReport" onClick={() => { downloadReport(); setIsMobileMenuOpen(false); }} title="Descargar informe PDF">
               📄 Descargar informe
             </button>
             <button className="btn-logout" onClick={logout}>Cerrar sesión</button>

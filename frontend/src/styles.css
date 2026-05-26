@@ -506,6 +506,46 @@ html[data-theme="dark"] .auth-brand-title {
     padding: 16px 18px;
     border-bottom: 0;
     border-radius: 8px;
+    position: sticky;
+    top: 12px;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 101;
+}
+
+.hamburger-menu span {
+    width: 100%;
+    height: 2px;
+    background-color: #64748b;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+html[data-theme="dark"] .hamburger-menu span {
+    background-color: #cbd5e1;
+}
+
+.hamburger-menu.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.hamburger-menu.open span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger-menu.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
 }
 
 html[data-theme="dark"] .todo-header {
@@ -1076,20 +1116,49 @@ html[data-theme="dark"] .complete-modal p {
     }
 
     .todo-header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 16px;
+        position: sticky;
+        top: 0;
+        border-radius: 0;
+        margin-left: -12px;
+        margin-right: -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .hamburger-menu {
+        display: flex;
     }
 
     .header-actions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
         width: 100%;
-        justify-content: stretch;
+        background: #ffffff;
+        padding: 16px;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #e5e7eb;
+        z-index: 99;
+    }
+
+    html[data-theme="dark"] .header-actions {
+        background: #111827;
+        border-color: #374151;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-actions.show {
+        display: flex;
     }
 
     .header-actions button,
     .task-form button {
         flex: 1 1 100%;
         width: 100%;
+        margin-bottom: 0;
     }
 
     .task-form {
