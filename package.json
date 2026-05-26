@@ -1,0 +1,10 @@
+{
+  "name": "todo-task-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "dev": "npm run backend"
+  }
+}
