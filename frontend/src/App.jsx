@@ -681,8 +681,9 @@ function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="auth-container" id="authApp">
-        <div className="auth-card">
+      <div className="auth-wrapper">
+        <div className="auth-container" id="authApp">
+          <div className="auth-card">
           <div className="auth-header">
             <img
               src="/taskerly-logo.jpg"
@@ -742,6 +743,7 @@ function App() {
             <button type="submit" className="btn-auth-submit">{authSubmitText}</button>
           </form>
         </div>
+      </div>
       </div>
     );
   }

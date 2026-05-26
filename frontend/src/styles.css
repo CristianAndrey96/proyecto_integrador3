@@ -309,6 +309,23 @@ html[data-theme="dark"] .task-alarm {
 }
 
 /* --- Estilos Nuevos: Autenticación Premium (Glassmorphism) --- */
+.auth-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/auth-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    z-index: 9999;
+}
+
 .auth-container {
     width: 100%;
     max-width: 450px;
