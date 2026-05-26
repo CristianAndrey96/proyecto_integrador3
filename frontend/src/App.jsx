@@ -649,7 +649,7 @@ function App() {
         <section className="dashboard-hero">
           <div>
             <span className="dashboard-kicker">Panel de productividad</span>
-            <h1>Todo Tasks</h1>
+            <h1>Taskerly</h1>
             <p>Gestiona tus pendientes, fechas límite y alarmas desde un solo lugar.</p>
           </div>
           <div className={alarmStatusClass}>{alarmStatus}</div>
