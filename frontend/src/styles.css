@@ -333,6 +333,17 @@ html[data-theme="dark"] .task-alarm {
     margin-bottom: 30px;
 }
 
+.auth-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 22px;
+    margin: 0 auto 16px;
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(99, 102, 241, 0.35));
+    animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 .auth-brand-title {
     color: white;
     font-size: 1.9rem;
@@ -598,6 +609,39 @@ html[data-theme="dark"] .btn-theme-toggle {
     color: white;
     border-color: #ef4444;
     transform: translateY(-1px);
+}
+
+.btn-download-report {
+    padding: 10px 14px;
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #c4b5fd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-download-report:hover {
+    background: #6d28d9;
+    color: white;
+    border-color: #6d28d9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
+}
+
+html[data-theme="dark"] .btn-download-report {
+    background: rgba(167, 139, 250, 0.12);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.28);
+}
+
+html[data-theme="dark"] .btn-download-report:hover {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
 }
 
 #todoApp {

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -528,6 +530,121 @@ function App() {
     setTheme(nextTheme);
   };
 
+  const downloadReport = async () => {
+    // Cargar el logo como base64 para incrustarlo en el PDF
+    let logoDataUrl = null;
+    try {
+      const resp = await fetch('/taskerly-logo.jpg');
+      const blob = await resp.blob();
+      logoDataUrl = await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (_) { /* si falla, se omite el logo */ }
+
+    const now = new Date();
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // --- Encabezado ---
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, pageWidth, 44, 'F');
+    // Logo en el PDF
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'JPEG', 8, 4, 34, 34);
+    }
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('Taskerly', logoDataUrl ? 46 : 14, 16);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Informe de Tareas', logoDataUrl ? 46 : 14, 24);
+    doc.text(`Generado: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, logoDataUrl ? 46 : 14, 32);
+    doc.text(`Usuario: ${currentUser?.Username || ''}`, pageWidth - 14, 24, { align: 'right' });
+    doc.text(`Fecha: ${now.toLocaleDateString()}`, pageWidth - 14, 32, { align: 'right' });
+
+    // --- Resumen estadístico ---
+    const stats = [
+      { label: 'Total de tareas', value: dashboardStats.total, color: [37, 99, 235] },
+      { label: 'Pendientes',       value: dashboardStats.pending, color: [15, 118, 110] },
+      { label: 'Completadas',      value: dashboardStats.completed, color: [22, 163, 74] },
+      { label: 'Alarmas vencidas', value: dashboardStats.dueAlarms, color: [217, 119, 6] }
+    ];
+
+    const boxW = (pageWidth - 28 - 9) / 4;
+    let bx = 14;
+    const statsY = 50;
+    stats.forEach(stat => {
+      doc.setFillColor(...stat.color);
+      doc.roundedRect(bx, statsY, boxW, 22, 3, 3, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text(String(stat.value), bx + boxW / 2, statsY + 9, { align: 'center' });
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'normal');
+      doc.text(stat.label, bx + boxW / 2, statsY + 16, { align: 'center' });
+      bx += boxW + 3;
+    });
+
+    // --- Tabla de tareas ---
+    const tableRows = tasks.map(task => {
+      const isAlarmDue = task.AlarmTime && !task.Completed && new Date(task.AlarmTime) <= now;
+      const estado = task.Completed ? 'Completada' : isAlarmDue ? 'Alarma vencida' : 'Pendiente';
+      return [
+        task.Name,
+        task.Deadline ? new Date(task.Deadline).toLocaleDateString() : '—',
+        task.AlarmTime ? new Date(task.AlarmTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '—',
+        estado
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 78,
+      head: [['Tarea', 'Fecha límite', 'Alarma', 'Estado']],
+      body: tableRows,
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 9
+      },
+      bodyStyles: { fontSize: 9, cellPadding: 3 },
+      alternateRowStyles: { fillColor: [241, 245, 249] },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 30, halign: 'center' },
+        2: { cellWidth: 36, halign: 'center' },
+        3: { cellWidth: 28, halign: 'center' }
+      },
+      didParseCell: data => {
+        if (data.section === 'body' && data.column.index === 3) {
+          const val = data.cell.raw;
+          if (val === 'Completada')     data.cell.styles.textColor = [22, 163, 74];
+          else if (val === 'Alarma vencida') data.cell.styles.textColor = [217, 119, 6];
+          else                          data.cell.styles.textColor = [15, 118, 110];
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+      margin: { left: 14, right: 14 }
+    });
+
+    // --- Pie de página ---
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setTextColor(148, 163, 184);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Taskerly · Página ${i} de ${totalPages}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 8, { align: 'center' });
+    }
+
+    const fileName = `taskerly_informe_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`;
+    doc.save(fileName);
+  };
+
   const acceptAlarmNotification = () => {
     setAlarmModalTask(null);
     window.focus();
@@ -567,6 +684,11 @@ function App() {
       <div className="auth-container" id="authApp">
         <div className="auth-card">
           <div className="auth-header">
+            <img
+              src="/taskerly-logo.jpg"
+              alt="Taskerly logo"
+              className="auth-logo"
+            />
             <h1 className="auth-brand-title">Bienvenido a Taskerly</h1>
             <h2>{authTitle}</h2>
             <p>{authSubtitle}</p>
@@ -641,6 +763,9 @@ function App() {
             </button>
             <button className="btn-enable-alarms" disabled={alarmButtonDisabled} onClick={enableAlarms}>
               {alarmButtonText}
+            </button>
+            <button className="btn-download-report" id="btnDownloadReport" onClick={downloadReport} title="Descargar informe PDF">
+              📄 Descargar informe
             </button>
             <button className="btn-logout" onClick={logout}>Cerrar sesión</button>
           </div>
