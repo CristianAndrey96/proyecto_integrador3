@@ -550,6 +550,18 @@ function App() {
     return currentUser.Username.charAt(0).toUpperCase();
   }, [currentUser]);
 
+  const dashboardStats = useMemo(() => {
+    const now = new Date();
+    const total = tasks.length;
+    const completed = tasks.filter(task => task.Completed).length;
+    const pending = total - completed;
+    const dueAlarms = tasks.filter(task => (
+      task.AlarmTime && !task.Completed && new Date(task.AlarmTime) <= now
+    )).length;
+
+    return { total, pending, completed, dueAlarms };
+  }, [tasks]);
+
   if (!isAuthenticated) {
     return (
       <div className="auth-container" id="authApp">
@@ -614,7 +626,7 @@ function App() {
 
   return (
     <div id="todoApp">
-      <div className="container">
+      <div className="dashboard-shell">
         <div className="todo-header">
           <div className="user-profile">
             <div className="avatar">{usernameInitial}</div>
@@ -634,8 +646,33 @@ function App() {
           </div>
         </div>
 
-        <h1>📝 Todo Tasks</h1>
-        <div className={alarmStatusClass}>{alarmStatus}</div>
+        <section className="dashboard-hero">
+          <div>
+            <span className="dashboard-kicker">Panel de productividad</span>
+            <h1>Todo Tasks</h1>
+            <p>Gestiona tus pendientes, fechas límite y alarmas desde un solo lugar.</p>
+          </div>
+          <div className={alarmStatusClass}>{alarmStatus}</div>
+        </section>
+
+        <section className="stats-grid" aria-label="Resumen de tareas">
+          <div className="stat-card">
+            <span>Total</span>
+            <strong>{dashboardStats.total}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Pendientes</span>
+            <strong>{dashboardStats.pending}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Completadas</span>
+            <strong>{dashboardStats.completed}</strong>
+          </div>
+          <div className="stat-card warning">
+            <span>Alarmas vencidas</span>
+            <strong>{dashboardStats.dueAlarms}</strong>
+          </div>
+        </section>
 
         <div className={`alarm-modal ${alarmModalTask ? 'show' : ''}`} aria-hidden={!alarmModalTask}>
           <div className="alarm-modal-content">
@@ -657,37 +694,68 @@ function App() {
           </div>
         </div>
 
-        <div className="task-form">
-          <input
-            type="text"
-            placeholder="Escribe una nueva tarea..."
-            value={newTask.name}
-            onChange={event => setNewTask({ ...newTask, name: event.target.value })}
-            onKeyDown={event => {
-              if (event.key === 'Enter') addTask();
-            }}
-          />
-          <input
-            type="date"
-            value={newTask.deadline}
-            onChange={event => setNewTask({ ...newTask, deadline: event.target.value })}
-          />
-          <input
-            type="date"
-            title="Fecha de alarma"
-            value={newTask.alarmDate}
-            onChange={event => setNewTask({ ...newTask, alarmDate: event.target.value })}
-          />
-          <input
-            type="time"
-            title="Hora de alarma"
-            value={newTask.alarmTime}
-            onChange={event => setNewTask({ ...newTask, alarmTime: event.target.value })}
-          />
-          <button onClick={addTask}>Agregar</button>
-        </div>
+        <main className="dashboard-grid">
+          <section className="task-panel task-create-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-kicker">Nueva tarea</span>
+                <h2>Crear pendiente</h2>
+              </div>
+            </div>
 
-        <ul className="task-list" id="taskList">
+            <div className="task-form">
+              <label>
+                <span>Tarea</span>
+                <input
+                  type="text"
+                  placeholder="Escribe una nueva tarea..."
+                  value={newTask.name}
+                  onChange={event => setNewTask({ ...newTask, name: event.target.value })}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter') addTask();
+                  }}
+                />
+              </label>
+              <label>
+                <span>Fecha límite</span>
+                <input
+                  type="date"
+                  value={newTask.deadline}
+                  onChange={event => setNewTask({ ...newTask, deadline: event.target.value })}
+                />
+              </label>
+              <label>
+                <span>Fecha de alarma</span>
+                <input
+                  type="date"
+                  title="Fecha de alarma"
+                  value={newTask.alarmDate}
+                  onChange={event => setNewTask({ ...newTask, alarmDate: event.target.value })}
+                />
+              </label>
+              <label>
+                <span>Hora de alarma</span>
+                <input
+                  type="time"
+                  title="Hora de alarma"
+                  value={newTask.alarmTime}
+                  onChange={event => setNewTask({ ...newTask, alarmTime: event.target.value })}
+                />
+              </label>
+              <button onClick={addTask}>Agregar tarea</button>
+            </div>
+          </section>
+
+          <section className="task-panel task-list-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-kicker">Gestión</span>
+                <h2>Tareas recientes</h2>
+              </div>
+              <span className="panel-count">{dashboardStats.pending} pendientes</span>
+            </div>
+
+            <ul className="task-list" id="taskList">
           {tasks.length === 0 && (
             <div className="empty-state">
               <div className="empty-state-icon">📋</div>
@@ -758,7 +826,9 @@ function App() {
               </li>
             );
           })}
-        </ul>
+            </ul>
+          </section>
+        </main>
       </div>
     </div>
   );
