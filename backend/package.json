@@ -17,6 +17,8 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
-    "node-env-file": "^0.1.8"
+    "node-cron": "^4.2.1",
+    "node-env-file": "^0.1.8",
+    "nodemailer": "^8.0.10"
   }
 }

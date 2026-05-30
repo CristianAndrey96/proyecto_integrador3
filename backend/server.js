@@ -13,6 +13,10 @@ if (!process.env.ON_RENDER) {
 const connectDB = require('./src/config/db');
 connectDB();
 
+// 2b. Iniciar scheduler de recordatorios por email
+const { startReminderScheduler } = require('./src/services/reminderScheduler');
+startReminderScheduler();
+
 const api = require('./src/routes/api');
 const port = process.env.PORT || 3000;
 const app = express();
