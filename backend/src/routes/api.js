@@ -5,20 +5,21 @@ const authController = require('../controllers/authController');
 const taskController = require('../controllers/taskController');
 const authenticateToken = require('../middlewares/auth');
 
-// Autenticación
+// Rutas de autenticación
 router.post('/register', authController.register);
 router.post('/login', authController.login);
-router.put('/update-profile', authenticateToken, authController.updateProfile);
 
-// Tareas
+// Rutas de tareas (Protegidas)
 router.post('/create-task', authenticateToken, taskController.createTask);
 router.get('/all-tasks', authenticateToken, taskController.getAllTasks);
 router.put('/update-task', authenticateToken, taskController.updateTask);
 router.put('/complete-task', authenticateToken, taskController.completeTask);
 router.delete('/delete-task', authenticateToken, taskController.deleteTask);
 
-// Kanban
+// ── Rutas Kanban ─────────────────────────────────────────────────────────────────────
+// Mover una tarea entre columnas (cambia Status)
 router.put('/move-task', authenticateToken, taskController.moveTask);
+// Reordenar tareas dentro de una columna (actualiza Order)
 router.put('/reorder-tasks', authenticateToken, taskController.reorderTasks);
 
 module.exports = router;
