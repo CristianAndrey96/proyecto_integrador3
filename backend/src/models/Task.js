@@ -9,6 +9,10 @@ const TaskSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    Description: {
+        type: String,
+        default: ''
+    },
     Deadline: {
         type: Date,
         default: Date.now
@@ -26,6 +30,25 @@ const TaskSchema = new mongoose.Schema({
         type: Date,
         required: false,
         default: null
+    },
+    // ── Nuevos campos Kanban ──────────────────────────────────
+    Status: {
+        type: String,
+        enum: ['todo', 'in_progress', 'done'],
+        default: 'todo'
+    },
+    Priority: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'medium'
+    },
+    Tags: {
+        type: [String],
+        default: []
+    },
+    Order: {
+        type: Number,
+        default: 0
     }
 });
 

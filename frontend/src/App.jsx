@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
+import KanbanBoard from './KanbanBoard';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 function getStoredUser() {
@@ -50,6 +50,7 @@ function formatAlarmDisplay(dateValue) {
 }
 
 function App() {
+  
   const [tasks, setTasks] = useState([]);
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [currentUser, setCurrentUser] = useState(getStoredUser);
